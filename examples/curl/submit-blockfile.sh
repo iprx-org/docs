@@ -15,7 +15,8 @@
 #   --limit N                 nominate at most N eligible addresses
 #   --reason TEXT             default reason when the file has none
 #   --email / --name / --org  your identity (required for a live submit)
-#   --delay SECONDS           pause between live posts (default 1)
+#   --token TOKEN             verified API token (or set IPRX_TOKEN); skips PoW, no rate limit
+#   --delay SECONDS           pause between live posts (default 1 without a token, 0 with a token)
 #   --output FILE             append per-IP results JSONL (event_id, receipt_url)
 #   --format auto|...         force a parser; auto is the default
 #   --max-cidr-size 256       refuse to expand a prefix larger than this
@@ -24,10 +25,11 @@
 #   --base URL                default https://iprx.org
 #
 # Private, reserved, loopback, and documentation addresses are skipped.
-# Duplicates are dropped. The live API allows 10 nominations per hour; the
-# script honours HTTP 429. One submitter email counts as one nominator toward
-# the 5-distinct-nominator listing threshold, no matter how many IPs are in the file.
-# A batch nomination endpoint would avoid one proof-of-work per IP; it is not in this release.
+# Duplicates are dropped. Anonymous posts are capped at 10 nominations per hour
+# and must solve a proof-of-work; the script honours HTTP 429. With --token or
+# IPRX_TOKEN there is no nomination rate limit and the proof-of-work is skipped.
+# One submitter email counts as one nominator toward the 5-distinct-nominator
+# listing threshold, no matter how many IPs are in the file.
 
 set -euo pipefail                                    # exit on error, unset variable, or a failed pipe
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # directory of this script, so we can find ../python

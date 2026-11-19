@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-// Nominate one IPv4 address: fetch a challenge, solve the proof-of-work, POST /nominations.
-// Usage: node nominate.mjs <ipv4> [reason]
+// Nominate one IPv4 address via POST /api/v1/nominations.
+// Usage:
+//   node nominate.mjs <ipv4> [reason]                    // anonymous: solves the proof-of-work
+//   IPRX_TOKEN=iprx_… node nominate.mjs <ipv4> [reason]  // verified token: skips PoW, no rate limit
 // Documentation, private, and reserved addresses are rejected with HTTP 400.
 
 import { createHash } from "node:crypto";             // SHA-256 for the proof-of-work
@@ -10,6 +12,7 @@ const IP = process.argv[2] || "192.0.2.10";               // default TEST-NET is
 const REASON = process.argv[3] || "TEST documentation nomination from the IPRX examples; RFC 5737 TEST-NET."; // >= 8 chars
 const NAME = process.env.IPRX_NAME || "IPRX examples TEST"; // your display name
 const EMAIL = process.env.IPRX_EMAIL || "docs-test@example.com"; // used to count distinct nominators
+const TOKEN = (process.env.IPRX_TOKEN || "").trim();  // optional Bearer token; if set, skip the proof-of-work
 
 function leadingZeroBits(buf) {                       // count leading zero bits in a hash
   let zeros = 0;                                      // running total
@@ -30,10 +33,8 @@ function solvePow(challenge, bits) {                  // find a nonce with enoug
   }
 }
 
-const chResp = await fetch(`${BASE}/api/v1/challenge`); // one-time challenge
-const ch = await chResp.json();                       // {challenge, bits, expires_in}
-if (!chResp.ok) throw new Error(`challenge failed: ${chResp.status}`); // cannot continue
-const nonce = solvePow(ch.challenge, ch.bits || 18);  // usually 18 bits
+const headers = { "Content-Type": "application/json", Accept: "application/json" }; // JSON in and out
+if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`; // format: Authorization: Bearer iprx_…
 const body = {                                        // NominationIn
   ip: IP,                                             // address to nominate
   reason: REASON,                                     // why it should be listed
@@ -41,13 +42,18 @@ const body = {                                        // NominationIn
   name: NAME,                                         // who is nominating
   email: EMAIL,                                       // used to count distinct nominators
   org: "IPRX docs examples",                          // optional organisation
-  challenge: ch.challenge,                            // opaque string from GET /challenge
-  pow_nonce: nonce,                                   // the nonce we just found
   company_url: "",                                    // honeypot; must stay empty
 };
+if (!TOKEN) {                                         // anonymous path still needs a challenge
+  const chResp = await fetch(`${BASE}/api/v1/challenge`); // one-time challenge
+  const ch = await chResp.json();                     // {challenge, bits, expires_in}
+  if (!chResp.ok) throw new Error(`challenge failed: ${chResp.status}`); // cannot continue
+  body.challenge = ch.challenge;                      // opaque string from GET /challenge
+  body.pow_nonce = solvePow(ch.challenge, ch.bits || 18); // usually 18 bits
+}
 const resp = await fetch(`${BASE}/api/v1/nominations`, {
   method: "POST",                                     // create a nomination
-  headers: { "Content-Type": "application/json", Accept: "application/json" }, // JSON in and out
+  headers,                                            // includes Authorization when IPRX_TOKEN is set
   body: JSON.stringify(body),                         // NominationIn
 });
 console.log(resp.status);                             // 201 on success, 400 for TEST-NET
