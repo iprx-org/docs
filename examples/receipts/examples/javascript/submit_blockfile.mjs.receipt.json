@@ -1,25 +1,25 @@
 {
   "format": "iprx.org/file-receipt/v1",
   "path": "examples/javascript/submit_blockfile.mjs",
-  "size": 1939,
-  "sha256": "db12510194aad13f177d8049a2906627cb1c13f95bf9b927bd13ae0736ced22d",
-  "stamped_at": "2026-11-19T05:30:54Z",
-  "stamped_at_et": "2026-11-19 12:30:54 AM America/New_York",
+  "size": 2075,
+  "sha256": "d26cd6c260e3c0c84d39b1e4539f5db3e0590370c2f9937e0ae5b17f7b32756b",
+  "stamped_at": "2026-11-19T05:57:48Z",
+  "stamped_at_et": "2026-11-19 12:57:48 AM America/New_York",
   "chain": "verae-substrate",
   "chain_label": "Verae Timestamping (Verae's own Substrate blockchain)",
   "status": "stamped",
   "source": "nats-pack",
-  "block_number": null,
-  "block_hash": "946cf5af3c1e23c437861c128c02dff1cbee64a01d91c20487fd0455c4087a29",
-  "root": "33d7680bca97a5e3acbf87ce87631134b452c5676b46aba2e472b467843bc00d",
-  "batch_id": "b2ff22d3f840c43fdde356fe31560c3a1708269d55637acfca651b978339e2c0",
-  "job_id": "iprx-db12510194aad13f-1795066254",
-  "sealer": "Three",
+  "block_number": 9766307,
+  "block_hash": "e9e9f31cbfe969ecf547039da860192fb58ec22210b5b3302c7f4a20cbfbc85f",
+  "root": "9174571267697cc1e32fcb1eb3ad2acdaba47e236353c27c8e2cf33ed7904265",
+  "batch_id": "8233a122d4f9b1e3b494735666072d176fbb04ded625ebf960ea1ae51b29356d",
+  "job_id": "iprx-d26cd6c260e3c0c8-1795067868",
+  "sealer": "Two",
   "merkle_proof": {
     "siblings": [],
     "is_left": []
   },
   "proof_ok": true,
-  "verify_url": "https://explorer.verae.ai/time?receipt=b2ff22d3f840c43fdde356fe31560c3a1708269d55637acfca651b978339e2c0&sha256=db12510194aad13f177d8049a2906627cb1c13f95bf9b927bd13ae0736ced22d",
-  "verify_instructions": "Compute the SHA-256 of the file bytes and confirm it equals sha256 in this receipt. Then check the Merkle proof against root, and confirm root is in the Verae block identified by block_hash. The original stamp wins; a restamp only adds history. Explorer: https://explorer.verae.ai/time?receipt=b2ff22d3f840c43fdde356fe31560c3a1708269d55637acfca651b978339e2c0&sha256=db12510194aad13f177d8049a2906627cb1c13f95bf9b927bd13ae0736ced22d"
+  "verify_url": "https://explorer.verae.ai/time?receipt=8233a122d4f9b1e3b494735666072d176fbb04ded625ebf960ea1ae51b29356d&sha256=d26cd6c260e3c0c84d39b1e4539f5db3e0590370c2f9937e0ae5b17f7b32756b",
+  "verify_instructions": "Compute the SHA-256 of the file bytes and confirm it equals sha256 in this receipt. Then check the Merkle proof against root, and confirm root is in the Verae block identified by block_hash. The original stamp wins; a restamp only adds history. Explorer: https://explorer.verae.ai/time?receipt=8233a122d4f9b1e3b494735666072d176fbb04ded625ebf960ea1ae51b29356d&sha256=d26cd6c260e3c0c84d39b1e4539f5db3e0590370c2f9937e0ae5b17f7b32756b"
 }
