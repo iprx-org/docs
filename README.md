@@ -2,7 +2,7 @@
 
 Public documentation for [IPRX](https://iprx.org), a worldwide IPv4 blocklist built from honeypot data, with optional downloadable feeds and Verae-timestamped receipts.
 
-The DNS blocklist at `bl.georgelambert.org` is live. The public site — About, Check, Nominate, Remove, and History — is at [https://blocklist.iprx.org/](https://blocklist.iprx.org/). The API is live at [https://blocklist.iprx.org/api/v1/](https://blocklist.iprx.org/api/v1/) and [https://iprx.org/api/v1/](https://iprx.org/api/v1/), with OpenAPI at [https://blocklist.iprx.org/docs](https://blocklist.iprx.org/docs). Receipts are available as JSON, HTML, and PDF. Downloadable block files are **not published yet**; they will be released only after the lists are confirmed reliable.
+The DNS blocklist is live at `all.bl.iprx.org` and the category zones in [dnsbl-zones.md](dnsbl-zones.md). The older `bl.georgelambert.org` zone stays up as an alias of the combined list. The public site — About, Check, Nominate, Remove, and History — is at [https://blocklist.iprx.org/](https://blocklist.iprx.org/). The API is live at [https://blocklist.iprx.org/api/v1/](https://blocklist.iprx.org/api/v1/) and [https://iprx.org/api/v1/](https://iprx.org/api/v1/), with OpenAPI at [https://blocklist.iprx.org/docs](https://blocklist.iprx.org/docs). Receipts are available as JSON, HTML, and PDF. Downloadable block files are **not published yet**; they will be released only after the lists are confirmed reliable.
 
 ## Contents
 
@@ -11,6 +11,7 @@ The DNS blocklist at `bl.georgelambert.org` is live. The public site — About, 
 | [File formats](file-formats.md) | Every feed format the generator produces, plus items still planned |
 | [Update frequency](update-frequency.md) | How often the DNSBL and feeds refresh, and how versions are named |
 | [Usage](usage.md) | DNSBL queries, mail and firewall snippets, Bloom readers, checksums, receipt checks |
+| [DNSBL zones](dnsbl-zones.md) | IPRX zone family on ns-bl.iprx.org (70.88.205.140): all, attack, brute, spam, web, bot, proxy, policy, nominated, allow, dbl, uri, and return codes |
 | [API](api.md) | Live nominations, removal requests, IP checks, history, and receipt downloads as JSON, HTML, or PDF |
 | [Examples](examples/README.md) | Copy-and-run curl, Python, JavaScript, Go, and dig requests, with a comment on every line and a JSONL catalog |
 | [Scripts](scripts.md) | Why every example line is documented, how the JSONL format is laid out, and how to verify each file's Verae receipt |
