@@ -5,12 +5,14 @@
 // This Node entry point runs the documented Python submitter so every supported
 // format is parsed the same way (fail2ban, ipset, iptables, nftables, CrowdSec,
 // CSV, hosts.deny, Apache/nginx, DROP-style lists, and plain IP/CIDR lists).
-// Pass the same flags as python3 submit_blockfile.py — they are forwarded unchanged.
+// Pass the same flags as python3 submit_blockfile.py — they are forwarded unchanged,
+// including --token or the IPRX_TOKEN environment variable.
 //
 // One submitter email counts as one nominator toward the 5-distinct-nominator
 // listing threshold, no matter how many IPs are in the file. This script does
 // not send email. Private, reserved, and documentation addresses are skipped
 // unless you pass --submit-documentation (TEST ONLY; the API returns HTTP 400).
+// A verified token skips the proof-of-work and the anonymous 10/hour cap.
 
 import { spawn } from "node:child_process";           // run the Python submitter
 import { fileURLToPath } from "node:url";             // this file's path

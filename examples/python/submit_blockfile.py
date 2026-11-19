@@ -3,11 +3,13 @@
 # Usage:
 #   python3 submit_blockfile.py --dry-run ../samples/fail2ban.log
 #   python3 submit_blockfile.py --limit 3 --reason "lab sensor ban" --email you@example.org --name "Your Name" bans.txt
-# Every nomination uses your email (and the client IP the API sees) as one nominator.
+#   python3 submit_blockfile.py --token "$IPRX_TOKEN" --email you@example.org --name "Your Name" bans.txt
+# Every nomination uses your verified email (and the client IP the API sees) as one nominator.
 # Five distinct nominators are required before IPRX auto-lists an address; a bulk
 # file from one person still counts as a single nominator for each IP, not five.
 # Documentation, reserved, and private addresses are skipped (and rejected by the API).
-# The live API allows 10 nominations per hour; this script paces itself and honours 429.
+# Anonymous submissions are capped at 10 an hour and must solve a proof-of-work.
+# A verified token (--token or IPRX_TOKEN) skips the proof-of-work and has no rate limit.
 
 from __future__ import annotations  # allow modern type hints on older Python
 
@@ -301,12 +303,14 @@ def solve_pow(challenge: str, bits: int) -> str:  # define solve_pow()
             return n  # return the result
         nonce += 1  # see the flag or value on this line
 
-def http_json(method: str, url: str, body: dict[str, Any] | None = None, timeout: int = 30) -> tuple[int, Any]:  # define http_json()
+def http_json(method: str, url: str, body: dict[str, Any] | None = None, timeout: int = 30, token: str | None = None) -> tuple[int, Any]:  # define http_json()
     # GET or POST JSON and return (status, parsed body).
     data = None if body is None else json.dumps(body).encode("utf-8")  # encode the object
     headers = {"Accept": "application/json", "User-Agent": "iprx-docs-examples/1.0"}  # identify this script
     if data is not None:  # branch: if data is not None
         headers["Content-Type"] = "application/json"  # the nominations API expects JSON
+    if token:  # a verified API token skips the proof-of-work and the anonymous rate limit
+        headers["Authorization"] = f"Bearer {token}"  # format: Authorization: Bearer iprx_…
     req = urllib.request.Request(url, data=data, headers=headers, method=method)  # local variable used in the next steps
     try:  # try the next statement
         with urllib.request.urlopen(req, timeout=timeout) as resp:  # follow the request
@@ -321,12 +325,7 @@ def http_json(method: str, url: str, body: dict[str, Any] | None = None, timeout
         return exc.code, parsed  # return the result
 
 def submit_one(base: str, item: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:  # define submit_one()
-    # Fetch a challenge, solve it, and POST one nomination.
-    status, challenge = http_json("GET", f"{base}/api/v1/challenge")  # start a new proof-of-work
-    # branch: if status != 200 or not isinstance(challenge, dict) or "challenge" not in challenge
-    if status != 200 or not isinstance(challenge, dict) or "challenge" not in challenge:  # challenge endpoint must succeed
-        return {"ip": item["ip"], "ok": False, "http_status": status, "error": challenge}  # cannot continue
-    nonce = solve_pow(str(challenge["challenge"]), int(challenge.get("bits") or 18))  # usually 18 bits
+    # POST one nomination. With --token / IPRX_TOKEN, skip the proof-of-work.
     reason = item.get("reason") or args.reason  # per-line reason wins, then --reason
     body = {  # the NominationIn schema
         "ip": item["ip"],  # see the flag or value on this line
@@ -335,11 +334,17 @@ def submit_one(base: str, item: dict[str, Any], args: argparse.Namespace) -> dic
         "name": args.name,  # who is nominating
         "email": args.email,  # required by the API; also used to count distinct nominators
         "org": args.org,  # optional organisation
-        "challenge": challenge["challenge"],  # opaque string from GET /challenge
-        "pow_nonce": nonce,  # the nonce we just found
         "company_url": "",  # honeypot; must stay empty or the API rejects the request
     }  # see the flag or value on this line
-    status, resp = http_json("POST", f"{base}/api/v1/nominations", body)  # 201 on success
+    token = (args.token or "").strip() or None  # Bearer token, if the user supplied one
+    if not token:  # anonymous path still needs a challenge and a proof-of-work
+        status, challenge = http_json("GET", f"{base}/api/v1/challenge")  # start a new proof-of-work
+        if status != 200 or not isinstance(challenge, dict) or "challenge" not in challenge:  # challenge endpoint must succeed
+            return {"ip": item["ip"], "ok": False, "http_status": status, "error": challenge}  # cannot continue
+        nonce = solve_pow(str(challenge["challenge"]), int(challenge.get("bits") or 18))  # usually 18 bits
+        body["challenge"] = challenge["challenge"]  # opaque string from GET /challenge
+        body["pow_nonce"] = nonce  # the nonce we just found
+    status, resp = http_json("POST", f"{base}/api/v1/nominations", body, token=token)  # 201 on success
     row = {  # one results-JSONL object
         "ip": item["ip"],  # see the flag or value on this line
         "ok": status == 201,  # see the flag or value on this line
@@ -369,9 +374,12 @@ def main() -> int:  # define main()
     parser.add_argument("--submit-documentation", action="store_true", help="TEST ONLY: also POST RFC 5737 TEST-NET addresses; the API rejects them with HTTP 400")  # used in docs tests
     parser.add_argument("--limit", type=int, default=0, help="nominate at most N eligible addresses (0 means no cap)")  # cap
     parser.add_argument("--max-cidr-size", type=int, default=256, help="refuse to expand a prefix larger than this many addresses (default 256 = /24)")  # safety
-    parser.add_argument("--delay", type=float, default=1.0, help="seconds to wait between live submissions; the API also limits 10 nominations per hour")  # pacing
+    parser.add_argument("--delay", type=float, default=None, help="seconds to wait between live submissions (default 1 without a token, 0 with a token)")  # pacing
+    parser.add_argument("--token", default=os.environ.get("IPRX_TOKEN"), help="verified API token (or set IPRX_TOKEN); skips the proof-of-work and the anonymous 10/hour cap")  # auth
     parser.add_argument("--output", default="nomination-results.jsonl", help="where to append per-IP results as JSONL")  # results
     args = parser.parse_args()  # parse sys.argv
+    if args.delay is None:  # pick a default based on whether a token is present
+        args.delay = 0.0 if (args.token or "").strip() else 1.0  # token users have no rate limit
     path = args.path  # local file
     text = open(path, encoding="utf-8", errors="replace").read()  # load the whole file
     forced = None if args.format in {"auto", "fail2ban-banned", "crowdsec"} else args.format  # json covers those two
@@ -404,7 +412,10 @@ def main() -> int:  # define main()
     if not eligible:  # nothing to send
         print(f"# nothing to nominate ({len(skipped)} skipped)", file=sys.stderr)
         return 0  # success
-    print("# the live API currently accepts 10 nominations per 3600 seconds per client; 429s are retried", file=sys.stderr)
+    if (args.token or "").strip():  # verified token path
+        print("# using IPRX_TOKEN / --token: proof-of-work skipped, no per-token nomination rate limit", file=sys.stderr)
+    else:
+        print("# anonymous path: 10 nominations per hour per client; 429s are retried", file=sys.stderr)
     written = 0  # successful 201s
     with open(args.output, "a", encoding="utf-8") as fh:  # append, so reruns keep history
         for i, it in enumerate(eligible):  # one POST each
