@@ -27,7 +27,8 @@ A longer explanation of why the scripts are documented this way, how the JSONL l
 | History by IP | `GET` | `/api/v1/history/{ip}` | public views redact requestor contact |
 | History by hash_id | `GET` | `/api/v1/history/{hash_id}` | 64-character SHA-256 of the stamped payload |
 | Search by hostname (public) | `GET` | `/api/v1/search?q=` | also matches IP, hash_id, ASN, ISP, country |
-| Nominate an address | `POST` | `/api/v1/nominations` | challenge + proof-of-work; `company_url` must stay empty |
+| Request an API token | `POST` | `/api/v1/tokens/request` | emails a one-click link; first-time users accept the license and pick an org size |
+| Nominate an address | `POST` | `/api/v1/nominations` | challenge + proof-of-work, or `Authorization: Bearer <token>` |
 | Request a removal | `POST` | `/api/v1/removals` | returns `pending_dkim` and a one-time token |
 | Upload a DKIM-signed .eml | `POST` | `/api/v1/removals/{event_id}/dkim` | uploads a **local** file; the examples never send email |
 | DKIM status | `GET` | `/api/v1/removals/{event_id}/dkim-status` | `pending`, `passed`, or `failed` |
@@ -38,13 +39,13 @@ A longer explanation of why the scripts are documented this way, how the JSONL l
 
 Interactive OpenAPI: [https://iprx.org/docs](https://iprx.org/docs).
 
-## Proof-of-work, honeypot, and the 5-nominator rule
+## Proof-of-work, tokens, honeypot, and the 5-nominator rule
 
-Before `POST /api/v1/nominations` or `POST /api/v1/removals`, fetch a challenge and find a `pow_nonce` so that SHA-256 of `challenge` + `:` + `pow_nonce` has at least `bits` leading zero bits (usually 18). Challenges expire and cannot be reused. Leave `company_url` empty; any non-empty value is rejected.
+Request a token with `./curl/12-token-request.sh` or `python3 python/token_request.py` (set `IPRX_EMAIL`). A one-click email is sent; opening the link shows the token once. The same email can hold several labeled tokens. Send `Authorization: Bearer <token>` (or set `IPRX_TOKEN` / `--token` on the scripts) to skip the proof-of-work. Verified-token nominations have **no rate limit**. Anonymous web submissions still have a honeypot, a SHA-256 proof-of-work, and a cap of 10 nominations and 10 removal requests per hour per client.
 
-An address is listed automatically only after **5 distinct nominators**. Distinctness is counted by email and by the client IP the API sees. A bulk file from one person still counts as **one nominator** for each IP in the file, not one nominator per line. Removals are never automatic: DKIM must pass, and an operator still decides.
+Before an anonymous `POST /api/v1/nominations` or `POST /api/v1/removals`, fetch a challenge and find a `pow_nonce` so that SHA-256 of `challenge` + `:` + `pow_nonce` has at least `bits` leading zero bits (usually 18). Challenges expire and cannot be reused. Leave `company_url` empty; any non-empty value is rejected.
 
-The live API allows 10 nominations and 10 removal requests per hour per client. The bulk submitter paces itself and honours HTTP 429.
+An address is listed automatically only after **5 distinct verified nominators**. Distinctness is counted by verified email and by the client IP the API sees. Several tokens on one email still count as one nominator. A bulk file from one person still counts as **one nominator** for each IP in the file, not one nominator per line. Removals are never automatic: DKIM must pass, and an operator still decides.
 
 ## Bulk submitters
 
@@ -55,6 +56,8 @@ python3 python/submit_blockfile.py --dry-run samples/fail2ban.log
 ./curl/submit-blockfile.sh --dry-run samples/fail2ban.log
 node javascript/submit_blockfile.mjs --dry-run samples/fail2ban.log
 go run go/submit_blockfile.go --dry-run ../samples/fail2ban.log   # run from go/
+# live, with a verified token (skips the proof-of-work, no nomination rate limit):
+IPRX_TOKEN=iprx_… python3 python/submit_blockfile.py --email you@example.org --name "Your Name" bans.txt
 ```
 
 The Python script is the reference parser (every line is commented). The bash, JavaScript, and Go entry points run that same script so the formats stay in lockstep.
@@ -72,7 +75,7 @@ Supported formats, with samples in [samples/](samples/):
 
 The submitters skip private, reserved, loopback, and documentation (RFC 5737 TEST-NET) addresses, and they de-duplicate. `--dry-run` only prints what would be sent. `--limit` caps a live run. Results are appended as JSONL (`event_id`, `receipt_url`). `--submit-documentation` is a test-only flag that will POST TEST-NET addresses so you can see the API's HTTP 400; leave it off for real use.
 
-A **batch nomination endpoint** would avoid one challenge and proof-of-work per IP under the 10/hour limit. That endpoint is not in this release; please do not expect the examples to invent one.
+With a verified token the bulk submitter does not need a challenge per IP and is not capped at 10/hour. Anonymous runs still pace themselves and honour HTTP 429.
 
 ## DKIM for removal requests
 
