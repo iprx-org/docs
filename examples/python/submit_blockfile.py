@@ -333,6 +333,7 @@ def submit_one(base: str, item: dict[str, Any], args: argparse.Namespace) -> dic
         "evidence": args.evidence,  # optional supporting text
         "name": args.name,  # who is nominating
         "email": args.email,  # required by the API; also used to count distinct nominators
+        "category": args.category,  # optional DNSBL category proposed for a later listing
         "org": args.org,  # optional organisation
         "company_url": "",  # honeypot; must stay empty or the API rejects the request
     }  # see the flag or value on this line
@@ -366,6 +367,7 @@ def main() -> int:  # define main()
     parser.add_argument("--format", default="auto", help="force a parser: auto, json, csv, list, fail2ban-status, fail2ban-log, fail2ban-banned, ipset, iptables, nftables, nginx, apache, hosts.deny, spamhaus, crowdsec")  # optional
     parser.add_argument("--reason", default="Nominated from a local block file via the IPRX examples submitter.", help="default reason when the file has none")  # required-quality text
     parser.add_argument("--evidence", default=None, help="optional evidence string sent with every nomination")  # optional
+    parser.add_argument("--category", default=None, help="optional DNSBL category to propose: attack, brute, spam, web, bot, proxy, policy, nominated")  # used if the address later meets the 5-nominator threshold
     parser.add_argument("--name", default=None, help="your display name (sent as the nominator)")  # identity
     parser.add_argument("--email", default=None, help="your email; required for a live submit so distinct nominators can be counted")  # identity
     parser.add_argument("--org", default=None, help="optional organisation name")  # identity
