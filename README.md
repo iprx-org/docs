@@ -20,6 +20,8 @@ The DNS blocklist at `bl.georgelambert.org` is live. The public site — About, 
 | [Contributing](CONTRIBUTING.md) | How to suggest documentation changes |
 | [Security](SECURITY.md) | How to report a vulnerability or request a delisting |
 | [License](LICENSE) | Documentation is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| [Dataset license](license.md) | Draft IPRX dataset license and account terms (pending legal review) |
+| [Pricing](pricing.md) | Annual dataset prices, free tier, and the 14-day trial |
 
 ## Nothing Up Our Sleeves
 

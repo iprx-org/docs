@@ -11,7 +11,7 @@ IPRX is built so you do not have to take our word for anything. That is the same
 The example scripts are part of that promise:
 
 - **No hidden flags.** A comment on every line says what the line does and how you can change it (the host, the IP, the reason, the output path, and so on).
-- **No hidden credentials.** The scripts use only the public API. Tokens from a removal request are stored under `~/.iprx/` with mode 600 and are never written into this repository.
+- **No hidden credentials.** The scripts use only the public API. Set `IPRX_TOKEN` or pass `--token` for a verified API token; do not commit the token. Tokens from a removal request are stored under `~/.iprx/` with mode 600 and are never written into this repository.
 - **No hidden side effects.** Bulk submitters default to skipping documentation and private addresses. `--dry-run` prints what would be sent and does not call the write API. DKIM examples upload a local `.eml`; they never send email.
 - **The bytes you see are the bytes we stamped.** After this directory was finished, each file was hashed and anchored on Verae. The matching JSON and PDF receipts, and a stamped manifest, are in [examples/receipts/](examples/receipts/).
 
