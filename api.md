@@ -113,7 +113,7 @@ curl -sS -X POST https://iprx.org/api/v1/nominations \
   -d '{"ip":"203.0.113.10","reason":"Why this address should be listed.","email":"you@example.com"}'
 ```
 
-A Bearer token skips the proof-of-work. A per-token rate limit applies (default 60 requests per hour). The email on the token is the verified identity; several tokens on the same email still count as one nominator toward the 5-person rule.
+A Bearer token skips the proof-of-work and is not rate-limited, so bulk block-file submissions are not throttled. Anonymous nominations without a token stay capped at 10 per hour per IP, and still need the honeypot and proof-of-work. The email on the token is the verified identity; several tokens on the same email still count as one nominator toward the 5-person rule.
 
 List, issue another, and revoke (auth by any unrevoked token for that email):
 
