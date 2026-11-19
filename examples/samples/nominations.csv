@@ -1,0 +1,6 @@
+ip,reason
+192.0.2.10,TEST: repeated SSH failures on a lab sensor (RFC 5737 TEST-NET-1)
+192.0.2.11,TEST: listed in a lab fail2ban jail (RFC 5737 TEST-NET-1)
+198.51.100.10,TEST: SMTP abuse on a lab sensor (RFC 5737 TEST-NET-2)
+10.0.0.5,This private address must be skipped
+203.0.113.5,TEST: scanner on a lab sensor (RFC 5737 TEST-NET-3)

@@ -12,6 +12,8 @@ The DNS blocklist at `bl.georgelambert.org` is live. The public site — About, 
 | [Update frequency](update-frequency.md) | How often the DNSBL and feeds refresh, and how versions are named |
 | [Usage](usage.md) | DNSBL queries, mail and firewall snippets, Bloom readers, checksums, receipt checks |
 | [API](api.md) | Live nominations, removal requests, IP checks, history, and receipt downloads as JSON, HTML, or PDF |
+| [Examples](examples/README.md) | Copy-and-run curl, Python, JavaScript, Go, and dig requests, with a comment on every line and a JSONL catalog |
+| [Scripts](scripts.md) | Why every example line is documented, how the JSONL format is laid out, and how to verify each file's Verae receipt |
 | [Records and receipts](records-and-receipts.md) | Event schema, `hash_id`, first-wins + restamp history, how to verify |
 | [Verae](verae.md) | Verae’s timestamped tracking blockchain, measured performance, and why IPRX was quick to build |
 | [Nothing Up Our Sleeves](nothing-up-our-sleeves.md) | Our commitments to provable timestamps, data, and GitHub uploads, and how to verify them |

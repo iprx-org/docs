@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1001,
+    "origin": "crowdsec",
+    "type": "ban",
+    "scope": "Ip",
+    "value": "192.0.2.10",
+    "duration": "4h",
+    "reason": "crowdsecurity/ssh-bf",
+    "scenario": "crowdsecurity/ssh-bf"
+  },
+  {
+    "id": 1002,
+    "origin": "crowdsec",
+    "type": "ban",
+    "scope": "Ip",
+    "value": "198.51.100.10",
+    "duration": "4h",
+    "reason": "crowdsecurity/http-probing",
+    "scenario": "crowdsecurity/http-probing"
+  },
+  {
+    "id": 1003,
+    "origin": "crowdsec",
+    "type": "ban",
+    "scope": "Ip",
+    "value": "10.0.0.8",
+    "duration": "1h",
+    "reason": "should-be-skipped-private",
+    "scenario": "crowdsecurity/ssh-bf"
+  }
+]

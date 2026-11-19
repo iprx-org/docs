@@ -1,0 +1,12 @@
+# Sample output of: fail2ban-client status sshd
+# Every address here is an RFC 5737 documentation (TEST-NET) or RFC 1918 private address.
+# Private and documentation addresses are skipped by the submitters; they cannot be nominated.
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed: 1
+|  |- Total failed: 12
+|  `- File list:    /var/log/auth.log
+`- Actions
+   |- Currently banned: 3
+   |- Total banned: 3
+   `- Banned IP list:    192.0.2.10 192.0.2.11 10.0.0.8

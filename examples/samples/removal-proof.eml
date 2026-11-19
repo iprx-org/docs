@@ -1,0 +1,22 @@
+From: network-ops@example.com
+To: removals@iprx.org
+Subject: IPRX removal proof TOKEN_FROM_POST_REMOVALS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+This is a TEMPLATE only. It is not DKIM-signed, and it must not be sent as email.
+
+To use it:
+
+1. Run a removal example (for example python3 ../python/removal.py 192.0.2.1).
+2. Copy the one-time token from ~/.iprx/<event_id>.token (mode 600). Never commit the token.
+3. Replace TOKEN_FROM_POST_REMOVALS in the Subject (or mention the token in the body).
+4. Send this message FROM an address at the PTR hostname's registrable domain, or the
+   RDAP/WHOIS organisation or abuse-contact domain, using a mail server that adds a
+   valid DKIM signature for that domain.
+5. Save the delivered message as a raw .eml (including all headers) and upload it:
+
+     ./10-dkim-upload.sh <event_id> message.eml
+
+The upload scripts only POST a local file. They do not send email for you.
+A failed DKIM check is recorded and stamped; the request does not advance until a check passes.

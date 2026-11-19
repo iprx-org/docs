@@ -1,0 +1,8 @@
+# CIDR list. Prefixes /25 to /32 are expanded to individual hosts.
+# Larger prefixes are skipped unless you pass --max-cidr-size 256 or higher.
+# 192.0.2.0/30 expands to 192.0.2.0, 192.0.2.1, 192.0.2.2, 192.0.2.3
+192.0.2.0/30
+# 198.51.100.8/29 is eight TEST-NET-2 addresses
+198.51.100.8/29
+# This /22 would be 1024 addresses; the default cap skips it.
+203.0.113.0/22

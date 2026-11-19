@@ -1,0 +1,5 @@
+create iprx hash:ip family inet hashsize 1024 maxelem 65536
+add iprx 192.0.2.10
+add iprx 192.0.2.11 comment "TEST-NET-1 lab ban"
+add iprx 198.51.100.10
+add iprx 10.0.0.8

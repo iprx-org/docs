@@ -1,0 +1,7 @@
+; Spamhaus DROP-style list (ip ; comment)
+; These are RFC 5737 documentation prefixes, not real Spamhaus entries.
+192.0.2.10/32 ; SBL000000 TEST-NET-1 host
+192.0.2.11/32 ; SBL000001 TEST-NET-1 host
+198.51.100.8/29 ; SBL000002 TEST-NET-2 /29 (will be expanded)
+203.0.113.5/32 ; SBL000003 TEST-NET-3 host
+10.0.0.0/24 ; private range, every host must be skipped

@@ -1,0 +1,14 @@
+# Optional Cargo manifest for the Rust check example.
+# Usage from this directory: cargo run -- 192.0.2.1
+
+[package]                        # crate metadata
+name = "iprx-check"              # change the name if you are embedding this in another project
+version = "1.0.0"                # documentation snapshot; not a published crate
+edition = "2021"                 # modern Rust edition
+
+[[bin]]                          # one binary, built from check.rs
+name = "iprx-check"              # cargo run builds this
+path = "check.rs"                # the source file in this folder
+
+[dependencies]                   # crates this example needs
+ureq = "2"                       # small HTTPS client; `cargo add ureq` if you prefer

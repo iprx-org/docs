@@ -1,0 +1,6 @@
+# Build artifacts and local run output — not part of the stamped examples.
+__pycache__/
+*.pyc
+nomination-results.jsonl
+iprx-check
+iprx-check.exe
